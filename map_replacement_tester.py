@@ -81,6 +81,21 @@ class ZipTests(unittest.TestCase):
         for item in result:
             self.assertIsInstance(item, tuple)
 
+    def test_empty_lists_case_one(self):
+        """Case 1: One input list empty"""
+        result = self.code_under_test(self.alphas, [])
+        for item in result:
+            self.assertIsNone(item[1])
+
+    def test_empty_lists_case_two(self):
+        """Case 2: Both input lists empty"""
+        self.assertEqual([], self.code_under_test([], []))
+
+    def test_noniterable_argument(self):
+        """Ensure both behave the same when passing a non-iterable argument"""
+        # self.assertRaises(TypeError, self.code_under_test(1, self.alphas))
+        self.assertRaises(TypeError, self.code_under_test, [1, self.alphas])
+
 
 if __name__ == '__main__':
     unittest.main()
