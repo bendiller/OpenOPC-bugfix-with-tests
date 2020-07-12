@@ -4,6 +4,7 @@ more recent OpenOPC-Python3x that appears to have understandably missed some cod
 
 The tests are less to convince myself, and more to provide evidence in case I wind up issuing a PR to OpenOPC-Python3x.
 """
+import logging
 from sys import version_info
 import unittest
 
@@ -20,24 +21,29 @@ class ZipTests(unittest.TestCase):
     4. Must produce elements which are tuples of the n-th item of each list
     """
 
-    @staticmethod
-    def code_under_test(list_one, list_two):
-        """
-        Code for both versions of the code - the original v2.7 (to run tests under an interpreter of that version), and
-        the proposed new v3.8 code, to facilitate testing under v3.x.
+    @classmethod
+    def code_under_test_v2(cls, list_one, list_two):
+        """Original code from module; demonstrates original behavior when run under v2.7"""
+        return map(None, list_one, list_two)
 
-        Note: this code is not tested on anything pre-v2.7.
-        """
-        if version_info.major == 3:
-            from itertools import zip_longest
-            return list(zip_longest(list_one, list_two))
-        elif version_info.major == 2:
-            return map(None, list_one, list_two)
+    @classmethod
+    def code_under_test_v3(cls, list_one, list_two):
+        """New proposed code to replace problem code; demonstrates equivalent behavior when run under v3.8"""
+        from itertools import zip_longest
+        return list(zip_longest(list_one, list_two))
 
     @classmethod
     def setUpClass(cls):
         cls.alphas = ['a', 'b', 'c', 'd']
         cls.nums = [1, 2, 3, 4]
+
+        logging.basicConfig(level=logging.DEBUG)
+        if version_info.major == 3:
+            logging.debug("Detected v3.x interpreter - setting code-under-test appropriately")
+            cls.code_under_test = cls.code_under_test_v3
+        elif version_info.major == 2:
+            logging.debug("Detected v2.x interpreter - setting code-under-test appropriately")
+            cls.code_under_test = cls.code_under_test_v2
 
     def test_return_type(self):
         self.assertIsInstance(self.code_under_test(self.alphas, self.nums), list)
