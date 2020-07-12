@@ -93,7 +93,6 @@ class ZipTests(unittest.TestCase):
 
     def test_noniterable_argument(self):
         """Ensure both behave the same when passing a non-iterable argument"""
-        # self.assertRaises(TypeError, self.code_under_test(1, self.alphas))
         self.assertRaises(TypeError, self.code_under_test, [1, self.alphas])
 
 
