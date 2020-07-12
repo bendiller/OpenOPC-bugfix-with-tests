@@ -4,7 +4,7 @@ more recent OpenOPC-Python3x that appears to have understandably missed some cod
 
 The tests are less to convince myself, and more to provide evidence in case I wind up issuing a PR to OpenOPC-Python3x.
 """
-from itertools import zip_longest
+from sys import version_info
 import unittest
 
 
@@ -21,13 +21,18 @@ class ZipTests(unittest.TestCase):
     """
 
     @staticmethod
-    def code_under_test(list_one: list, list_two: list):
+    def code_under_test(list_one, list_two):
         """
-        New v3.8-centric code being tested - in the v2.7 project, this will contain the old code being replaced.
-        This should allow identical tests to be run with identical inputs, very easily, by replacing only the "code
-        under test", or payload.
+        Code for both versions of the code - the original v2.7 (to run tests under an interpreter of that version), and
+        the proposed new v3.8 code, to facilitate testing under v3.x.
+
+        Note: this code is not tested on anything pre-v2.7.
         """
-        return list(zip_longest(list_one, list_two))  # v2.7 version: return map(None, list_one, list_two)
+        if version_info.major == 3:
+            from itertools import zip_longest
+            return list(zip_longest(list_one, list_two))
+        elif version_info.major == 2:
+            return map(None, list_one, list_two)
 
     @classmethod
     def setUpClass(cls):
